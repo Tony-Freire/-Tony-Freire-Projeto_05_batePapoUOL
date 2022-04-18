@@ -50,7 +50,7 @@ function enviar()
             text: textodigitado,
             type:  "message"}
         
-        document.querySelector("caixadetexto").value = "";
+       
         const promise = axios.post("https://mock-api.driven.com.br/api/v6/uol/messages", texto)
         promise.then(pegarMensagens);
 }
