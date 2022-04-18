@@ -1,9 +1,11 @@
 let usuario;
 
+
 login();
 
 function Conectar() {
-    axios.post('https://mock-api.driven.com.br/api/v6/uol/status', usuario)
+    const promise =   axios.post('https://mock-api.driven.com.br/api/v6/uol/status', usuario)
+    promise.catch(erro)
 }
 
 function login() {
@@ -11,24 +13,52 @@ function login() {
         name: prompt('Qual seu nome?')
     }
 
-    const promise = axios.post('https://mock-api.driven.com.br/api/v6/uol/participants', usuario);
+    const promise = axios.post("https://mock-api.driven.com.br/api/v6/uol/participants", usuario);
 
     promise
         .then(() => {
             setInterval(Conectar, 5000);
+            pegarMensagens();
             setInterval(pegarMensagens, 3000)
         })
 
         .catch(() => {
             alert('Esse nome já exite');
             login()
-        })
+        })   
+        document.addEventListener("keyup", enviarComEnter);                                                                                      
 };
+function erro()
+{
+alert('Ocorreu um erro!');
+    window.location.reload();
+}
+function enviarComEnter(event)
+{
+    if(event.key === "Enter"){
+        enviar()
+    }
+}
+function enviar()
+{
+    let input = document.querySelector("#name");
+    let textodigitado = input.value;
+    
+        const texto = {
+            from: usuario.name,
+            to: "Todos",
+            text: textodigitado,
+            type:  "message"}
+        
+        document.querySelector("caixadetexto").value = "";
+        const promise = axios.post("https://mock-api.driven.com.br/api/v6/uol/messages", texto)
+        promise.then(pegarMensagens);
+}
 
 function pegarMensagens() {
-    const messagesPromise = axios.get('https://mock-api.driven.com.br/api/v6/uol/messages');
+    const Promise = axios.get('https://mock-api.driven.com.br/api/v6/uol/messages');
 
-    messagesPromise.then(renderizarMensagens)
+    Promise.then(renderizarMensagens)
 }
 
 function renderizarMensagens(mensagens) {
@@ -48,7 +78,7 @@ function renderizarMensagens(mensagens) {
                 </article>                              
             `
         } else if (                      
-            mensagem.type === 'private_mensagem' && (
+            mensagem.type === 'private_message' && (
                 mensagem.from === usuario.from ||
                 mensagem.from === usuario.to
             )
@@ -62,4 +92,5 @@ function renderizarMensagens(mensagens) {
     })
 
     main.lastElementChild.scrollIntoView();
+       
 }
